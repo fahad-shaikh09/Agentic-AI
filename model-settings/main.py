@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 from agents.model_settings import Reasoning
 import asyncio 
+from agents.model_settings import ToolChoice
+
 
 load_dotenv()
 
@@ -33,6 +35,7 @@ agent = Agent(
                   reasoning=Reasoning(
                         enabled=True,
                         summary="detailed",
+                        tool_choice=ToolChoice("auto")
                   )
               )
 )
