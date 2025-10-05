@@ -1,4 +1,4 @@
-from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool
+from agents import Agent, RunContextWrapper, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool
 from dotenv import load_dotenv
 import os
 from dataclasses import dataclass
@@ -9,36 +9,41 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 BASE_URL = os.getenv("BASE_URL")
 
+# --- Agent Setup ---
 client = AsyncOpenAI(
     api_key=GEMINI_API_KEY,
     base_url=BASE_URL
 )
 
+# Define the model
 model = OpenAIChatCompletionsModel(
     openai_client=client,
     model="gemini-2.5-flash",
 )
 
+# Define a dataclass for user context
 @dataclass 
 class UserContext:
     user_name: str
     user_role: str
     user_experience: str
 
-# @function_tool()
-# def get_user_context() -> UserContext:
-#     # In a real application, this data might come from a database or user profile service
-#     return UserContext(
-#         user_name="Alice",
-#         user_role="Software Engineer",
-#         user_experience="5 years in AI development"
-#     )
 
+# Define a tool that uses the user context
+@function_tool()
+def greet_user(context: RunContextWrapper[UserContext]) -> str:
+    # In a real application, this data might come from a database or user profile service
+    return f"Welcome {context.context.user_name}, i see you are {context.context.user_role}, having {context.context.user_experience}"
+
+
+# Define the agent with the tool
 agent = Agent(
     name="ContextAgent",
     model=model,
+    tools=[greet_user]
 )
 
+# Create a user context instance
 user_context = UserContext(
         user_name="Alice",
         user_role="Software Engineer",
@@ -46,11 +51,12 @@ user_context = UserContext(
     )
 
 
-
+# # Run the agent with the user context
 result = Runner.run_sync(agent,
-                         "Do you know who am i?",
+                         "Hi",
                          context=user_context
                          )
 
+# Print the agent's response
 print("AGENT'S RESPONSE: ", result.final_output)
 
