@@ -36,10 +36,16 @@ def greet_user(context: RunContextWrapper[UserContext]) -> str:
     return f"Welcome {context.context.user_name}, i see you are {context.context.user_role}, having {context.context.user_experience}"
 
 
+# Define the instruction function used by Agent's instructions that uses the user context
+def call_come_func(global_context: RunContextWrapper[UserContext], agent: Agent[Agent]) -> str:
+    return f"You are a helpful assistant {agent.name}. Greet user {global_context.context.user_name} using the greet_user tool."
+
+
 # Define the agent with the tool
 agent = Agent(
-    name="ContextAgent",
+    name="Context Management Agent",
     model=model,
+    instructions=call_come_func,
     tools=[greet_user]
 )
 
