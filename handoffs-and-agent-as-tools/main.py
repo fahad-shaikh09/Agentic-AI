@@ -85,7 +85,7 @@ inbox_monitor_agent.handoffs = [router_agent]
 router_agent.handoffs = [billing_agent, tech_support_agent, general_assistant_agent]
 
 # Running the Inbox Monitor Agent
-result = Runner.run_sync(inbox_monitor_agent, input="I have been charged twice against same order")
+result = Runner.run_sync(inbox_monitor_agent, input="Check unread emails and process any new requests.")
 
 print("ACTIVE AGENT: ", result.last_agent.name)
 print("AGENT'S RESPONSE: ", result.final_output)
