@@ -22,13 +22,16 @@ model = OpenAIChatCompletionsModel(
 # Inbox Monitor Agent
 @function_tool
 def get_unread_emails():
-    return "Unread message: 'My account was charged twice for the same order!'"
+    return "Unread message: is there a discount policy?'"
 
 
 inbox_monitor_agent: Agent = Agent(
     name="Inbox Monitor Agent",
     model=model,
-    instructions="You are a helpful Inbox Monitor Agent. Use the resources you have to assist users with their issues.",
+    instructions="""
+    You are a helpful Inbox Monitor Agent. Use the resources you have to assist users with their issues.
+    Do not describe the tool; actually call it if needed. use handoff if required, dont just mention their names.
+    """,
     tools=[get_unread_emails],
     handoff_description="You check unread emails and hand them off to the Router Agent for classification."
 )
@@ -49,17 +52,27 @@ router_agent: Agent = Agent(
 
 # Billing Support Agent
 @function_tool
-def billing_query_tool():
-    return "We've processed your refund for the duplicate charge"
-
+def billing_query_tool(issue_desc: str) -> str:
+    """
+    Handles billing and payment queries like refunds, invoices, or duplicate charges.
+    """
+    issue = issue_desc.lower()
+    if "refund" in issue: 
+        return "Your refund request is being processed. You’ll receive confirmation shortly."
+    elif "invoice" in issue:
+        return "Your invoice has been emailed to you."
+    elif "duplicate charge" in issue:
+        return "We have identified the duplicate charge and will refund it within 5-7 business days."
+    else:
+        return "For other billing issues, please contact our support team directly."
+    
+    
 billing_agent: Agent = Agent(
     name="Billing Support Agent",
     instructions="""
-    You are a Billing Support Agent. Handle all billing and payment related issues.
-    When you detect a message about double charge, refund, or invoice,
-    you MUST call the tool `billing_query_tool()` to provide the appropriate response.
-    After calling the tool, return its output as your final message to the user.
-    Do not just mention the tool name — actually use it.
+    You assist users with all payment, refund, discount and invoice issues.
+    When a billing issue is detected, use the available tool that processes billing queries.
+    Pass the user's message or issue as an argument to that tool and return its result.
     """,
     model=model,
     tools=[billing_query_tool],
@@ -83,11 +96,16 @@ tech_support_agent: Agent = Agent(
 
 
 # General Assistant Agent
+
+@function_tool
+def faqs_tool():
+    return "Our discount policy offers 10% off for first-time customers."
+
 general_assistant_agent: Agent = Agent(
     name="General Assistant Agent",
     instructions="You are a General Assistant Agent. Help users with general inquiries.",
     model=model,
-    tools=[],
+    tools=[faqs_tool],
 )
 
 # Setting up handoffs
