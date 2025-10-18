@@ -28,9 +28,9 @@ def get_unread_emails():
 inbox_monitor_agent: Agent = Agent(
     name="Inbox Monitor Agent",
     model=model,
-    instructions="You are a helpful Inbox Monitor Agent. Use the tools provided to assist users with their issues.",
+    instructions="You are a helpful Inbox Monitor Agent. Use the resources you have to assist users with their issues.",
     tools=[get_unread_emails],
-    handoff_description="You check unread emails and hand them off to the Router Agent."
+    handoff_description="You check unread emails and hand them off to the Router Agent for classification."
 )
 
 # Router Agent
@@ -54,7 +54,13 @@ def billing_query_tool():
 
 billing_agent: Agent = Agent(
     name="Billing Support Agent",
-    instructions="You are a Billing Support Agent. Help users with billing-related issues.",
+    instructions="""
+    You are a Billing Support Agent. Handle all billing and payment related issues.
+    When you detect a message about double charge, refund, or invoice,
+    you MUST call the tool `billing_query_tool()` to provide the appropriate response.
+    After calling the tool, return its output as your final message to the user.
+    Do not just mention the tool name — actually use it.
+    """,
     model=model,
     tools=[billing_query_tool],
 )
@@ -66,7 +72,11 @@ def tech_support_tool():
 
 tech_support_agent: Agent = Agent(
     name="Technical Support Agent",
-    instructions="You are a Technical Support Agent. Help users with technical issues.",
+    instructions="""
+    You are a Technical Support Agent. Handle all app or system-related problems.
+    When you detect a message mentioning errors, crashes, or issues,
+    you MUST call the tool `tech_support_tool()` and return its output as your final response.
+    Do not describe the tool; actually call it.""",
     model=model,
     tools=[tech_support_tool],
 )
