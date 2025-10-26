@@ -1,4 +1,4 @@
-from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool
+from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool, StopAtTools
 from dotenv import load_dotenv
 import os
 
@@ -31,7 +31,7 @@ agent = Agent(
     name="Tools Advanced concepts",
     model=model,
     instructions="You are a helpful assistant.",
-    tool_use_behavior="stop_on_first_tool",
+    tool_use_behavior=StopAtTools(stop_at_tool_names=["weather"]),
     tools=[weather],
 )
 
