@@ -1,5 +1,4 @@
-from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool, RunContextWrapper
-from dataclasses import dataclass
+from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, set_tracing_disabled, function_tool
 # from agents import StopAtTools
 from dotenv import load_dotenv
 import os
