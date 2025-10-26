@@ -39,6 +39,7 @@ agent = Agent(
 # # Run the agent with the user context
 result = Runner.run_sync(agent,
                          "Whats weather in Dubai?",
+                         max_turns=2
                          )
 
 # Print the agent's response
