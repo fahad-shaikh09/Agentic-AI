@@ -1,7 +1,8 @@
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, SQLiteSession
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
 import os
 from dotenv import load_dotenv
 import chainlit as cl
+
 
 load_dotenv()
 
@@ -14,8 +15,6 @@ model = OpenAIChatCompletionsModel(model="gemini-2.5-flash", openai_client=clien
 
 agent = Agent(name="chatbot-agent", model=model)
 
-
-session = SQLiteSession("temp_conversations")
 @cl.on_chat_start
 async def start():
 
@@ -24,7 +23,7 @@ async def start():
     
 @cl.on_message
 async def main(message: str):
-    runner = await Runner.run(agent, input=message.content, session=session)
+    runner = await Runner.run(agent, input=message.content)
     await cl.Message(content=runner.final_output).send()
     
     
